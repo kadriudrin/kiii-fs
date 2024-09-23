@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: 12345678
+      POSTGRES_DB: maindb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  backend:
+    build: ./backend
+    environment:
+      PGUSER: myuser
+      PGPASSWORD: 12345678
+      PGDATABASE: maindb
+      PGHOST: db
+      PGPORT: 5432
+      PORT: 5000
+    depends_on:
+      - db
+    ports:
+      - '5000:5000'
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+
+volumes:
+  db-data:
